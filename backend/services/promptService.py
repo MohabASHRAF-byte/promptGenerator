@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session, joinedload
 from starlette.exceptions import HTTPException
 
+from backend.Ai_Model.ChatGPT import ChatGPT
 from backend.models.prompt import Prompt
-from backend.schemas.prompt import AddPrompt, UpdatePrompt, GetSinglePrompt
+from backend.schemas.prompt import AddPrompt, UpdatePrompt, GetSinglePrompt, GeneratePrompt
 from backend.services.projectsService import get_project_service
 
 
@@ -55,3 +56,15 @@ def delete_prompt_service(pid: int, db: Session):
     db.delete(project)
     db.commit()
     return {"message": "Deleted successfully "}
+
+
+def generate_prompt_service(pid: int, genPrompt: GeneratePrompt, db: Session):
+    prompt = get_single_prompt_service(pid, db)
+    ins = [ins.content for ins in prompt.instructions]
+    chat_gpt = ChatGPT()
+    task = chat_gpt.generate_prompt(
+        ins,
+        genPrompt.content,
+        output_only_code=True
+    )
+    return task

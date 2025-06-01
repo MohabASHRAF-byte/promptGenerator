@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -23,9 +25,9 @@ def update_project(
     return update_instruction_service(iid, project, db)
 
 
-@router.delete("/{iid")
+@router.delete("/")
 def delete_project(
-        iid: int,
+        iids:List[int],
         db: Session = Depends(get_db)
 ):
-    return delete_instruction_service(iid, db)
+    return delete_instruction_service(iids, db)

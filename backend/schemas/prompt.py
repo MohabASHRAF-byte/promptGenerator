@@ -53,3 +53,11 @@ class GetSinglePrompt(GetPrompts):
             numOfInstructions=len(prompt.instructions) if prompt.instructions else 0,
             instructions=[InstructionBase.from_Instruction_orm(ins) for ins in prompt.instructions]
         )
+
+
+class GeneratePrompt(BaseModel):
+    content: str
+
+
+class GeneratePromptResponse(BaseModel):
+    prompt: str

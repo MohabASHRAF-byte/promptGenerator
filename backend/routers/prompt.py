@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from backend.config.database import get_db
-from backend.schemas.prompt import AddPrompt, GetPrompts, UpdatePrompt
+from backend.schemas.prompt import AddPrompt, GetPrompts, UpdatePrompt, GeneratePrompt
 from backend.services.promptService import add_new_prompt_service, update_prompt_service, delete_prompt_service, \
-    get_prompts_service, get_single_prompt_service
+    get_prompts_service, get_single_prompt_service, generate_prompt_service
 
 router = APIRouter(prefix="/prompts", tags=["prompts"])
 
@@ -29,7 +29,7 @@ def get_prompts(
         projectId: int,
         db: Session = Depends(get_db)
 ):
-    return get_prompts_service(projectId,db)
+    return get_prompts_service(projectId, db)
 
 
 @router.put("/{pid}")
@@ -41,9 +41,20 @@ def update_prompt(
     return update_prompt_service(pid, prompt, db)
 
 
-@router.delete("/{pid")
+@router.delete("/{pid}")
 def delete_prompt(
         pid: int,
         db: Session = Depends(get_db)
 ):
     return delete_prompt_service(pid, db)
+
+
+
+
+@router.post("/{pid}/generate")
+def generate_prompt(
+        pid: int,
+        prompt : GeneratePrompt,
+        db: Session = Depends(get_db)
+):
+    return generate_prompt_service(pid,prompt,db)

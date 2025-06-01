@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
@@ -31,8 +33,9 @@ def update_instruction_service(iid: int, inst: InstructionUpdate, db: Session):
     return ins
 
 
-def delete_instruction_service(iid: int, db: Session):
-    ins = get_single_instruction_service(iid, db)
-    db.delete(ins)
-    db.commit()
+def delete_instruction_service(iids: List[int], db: Session):
+    for iid in iids:
+        ins = get_single_instruction_service(iid, db)
+        db.delete(ins)
+        db.commit()
     return {"message": "Deleted successfully "}
