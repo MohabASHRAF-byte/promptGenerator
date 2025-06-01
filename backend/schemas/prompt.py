@@ -20,7 +20,6 @@ class UpdatePrompt(BaseModel):
 
 class GetPrompts(BaseModel):
     name : str
-    description : str
     code_only : bool
 
 
