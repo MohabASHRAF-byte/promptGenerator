@@ -1,8 +1,8 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from starlette.exceptions import HTTPException
 
 from backend.models.prompt import Prompt
-from backend.schemas.prompt import AddPrompt, UpdatePrompt
+from backend.schemas.prompt import AddPrompt, UpdatePrompt, GetSinglePrompt
 from backend.services.projectsService import get_project_service
 
 
@@ -16,6 +16,18 @@ def add_new_prompt_service(prompt: AddPrompt, db: Session):
 
 
 def get_single_prompt_service(pid: int, db: Session):
+    db_prompt = (
+        db.query(Prompt)
+        .options(joinedload(Prompt.instructions))
+        .filter(Prompt.id == pid)
+        .first()
+    )
+    if not db_prompt:
+        raise HTTPException(status_code=404, detail="Prompt not found")
+    return GetSinglePrompt.from_orm_prompt(db_prompt)
+
+
+def _get_single_prompt_service(pid: int, db: Session):
     db_project = db.query(Prompt).filter(pid == Prompt.id).first()
     if not db_project:
         raise HTTPException(status_code=404, detail="prompt not found")
@@ -28,7 +40,7 @@ def get_prompts_service(projectId: int, db: Session):
 
 
 def update_prompt_service(pid: int, prompt: UpdatePrompt, db: Session):
-    project = get_single_prompt_service(pid, db)
+    project = _get_single_prompt_service(pid, db)
     if prompt.code_only:
         project.code_only = prompt.code_only
     if prompt.name:
@@ -39,7 +51,7 @@ def update_prompt_service(pid: int, prompt: UpdatePrompt, db: Session):
 
 
 def delete_prompt_service(pid: int, db: Session):
-    project = get_single_prompt_service(pid, db)
+    project = _get_single_prompt_service(pid, db)
     db.delete(project)
     db.commit()
     return {"message": "Deleted successfully "}

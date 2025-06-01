@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from backend.config.database import get_db
 from backend.schemas.prompt import AddPrompt, GetPrompts, UpdatePrompt
 from backend.services.promptService import add_new_prompt_service, update_prompt_service, delete_prompt_service, \
-    get_prompts_service
+    get_prompts_service, get_single_prompt_service
 
 router = APIRouter(prefix="/prompts", tags=["prompts"])
 
@@ -21,7 +21,7 @@ def get_single_prompt(
         pid: int,
         db: Session = Depends(get_db)
 ):
-    return get_single_prompt(pid, db)
+    return get_single_prompt_service(pid, db)
 
 
 @router.get("/", response_model=List[GetPrompts])

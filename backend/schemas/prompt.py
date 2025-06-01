@@ -2,6 +2,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from backend.schemas.instruction import InstructionBase
+
 
 class PromptItem(BaseModel):
     name: str
@@ -39,4 +41,15 @@ class GetPrompts(BaseModel):
 
 
 class GetSinglePrompt(GetPrompts):
-    instructions: List[str]
+    numOfInstructions: int
+    instructions: List[InstructionBase]
+
+    @classmethod
+    def from_orm_prompt(cls, prompt):
+        return cls(
+            id=prompt.id,
+            name=prompt.name,
+            code_only=prompt.code_only,
+            numOfInstructions=len(prompt.instructions) if prompt.instructions else 0,
+            instructions=[InstructionBase.from_Instruction_orm(ins) for ins in prompt.instructions]
+        )
