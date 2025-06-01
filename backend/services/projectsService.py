@@ -31,11 +31,15 @@ def get_all_projects(db: Session) -> List[GetProjectsItem]:
     return ret_projects
 
 
-def update_project_service(id: int, project: UpdateProject, db: Session):
+def get_project_service(id: int, db: Session):
     db_project = db.query(Project).filter(id == Project.id).first()
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
+    return db_project
 
+
+def update_project_service(id: int, project: UpdateProject, db: Session):
+    db_project = get_project_service(id, db)
     if project.name is not None:
         db_project.name = project.name
     if project.description is not None:
@@ -44,3 +48,10 @@ def update_project_service(id: int, project: UpdateProject, db: Session):
     db.commit()
     db.refresh(db_project)
     return db_project
+
+
+def delete_project_service(id: int, db: Session):
+    db_project = get_project_service(id, db)
+    db.delete(db_project)
+    db.commit()
+    return {"message": "Deleted successfully "}
