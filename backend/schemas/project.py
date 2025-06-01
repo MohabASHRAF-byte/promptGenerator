@@ -1,8 +1,9 @@
-from typing import List, Optional
+from typing import List, Optional, Self
 
 from pydantic import BaseModel
 
-from backend.schemas.prompt import PromptItem
+from backend.models.projects import Project
+from backend.schemas.prompt import PromptItem, GetPrompts
 
 
 class ProjectBase(BaseModel):
@@ -14,11 +15,26 @@ class ProjectCreate(ProjectBase):
     description: str
 
 
-class GetProjectsItem(ProjectCreate):
+class GetProjectsItem(BaseModel):
     id: int
     name: str
     description: str
     numberOfItems: int
+
+
+class GetSingleProject(GetProjectsItem):
+    prompts: List[GetPrompts]
+
+    @classmethod
+    def from_orm_project(cls, proj: Project) -> Self:
+        return cls(
+            id=proj.id,
+            name=proj.name,
+            description=proj.description,
+            numberOfItems=len(proj.prompts) if proj.prompts else 0,
+            prompts=[GetPrompts.from_orm_prompt(prompt) for prompt in proj.prompts],
+
+        )
 
 
 class ProjectResponse(ProjectBase):

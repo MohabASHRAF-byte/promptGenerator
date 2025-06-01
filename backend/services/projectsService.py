@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, joinedload
 from starlette.exceptions import HTTPException
 
 from backend.models.projects import Project
-from backend.schemas.project import ProjectCreate, GetProjectsItem, UpdateProject
+from backend.schemas.project import ProjectCreate, GetProjectsItem, UpdateProject, GetSingleProject
 
 
 def add_new_project_service(project: ProjectCreate, db: Session):
@@ -33,12 +33,12 @@ def get_project_service(id: int, db: Session):
     db_project = (
         db.query(Project)
         .options(joinedload(Project.prompts))
-        .filter(id == Project.id)
+        .filter(Project.id == id)
         .first()
     )
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
-    return db_project
+    return GetSingleProject.from_orm_project(db_project)
 
 
 def update_project_service(id: int, project: UpdateProject, db: Session):
