@@ -3,11 +3,11 @@ from starlette.exceptions import HTTPException
 
 from backend.models.instruction import Instruction
 from backend.schemas.instruction import InstructionCreate, InstructionUpdate
-from backend.services.promptService import get_single_prompt_service
+from backend.services.promptService import _get_single_prompt_service
 
 
 def add_new_instruction_service(instruction: InstructionCreate, db: Session):
-    prompt = get_single_prompt_service(instruction.promptId, db)
+    prompt = _get_single_prompt_service(instruction.promptId, db)
     ins = Instruction(content=instruction.content, prompt=prompt)
     db.add(ins)
     db.commit()
