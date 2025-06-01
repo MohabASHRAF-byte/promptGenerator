@@ -17,6 +17,18 @@ frontend/.env.development.local
 frontend/.env.test.local
 frontend/.env.production.local
 frontend/.idea
+
+
+
+electron/backend
+electron/build
+electron/node_modules
+electron/index.html
+
+
+
+
+
 .idea/
 # macOS system files (still works anywhere)
 .DS_Store
