@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -16,12 +16,19 @@ class ProjectCreate(ProjectBase):
 
 class GetProjectsItem(ProjectCreate):
     id: int
+    name: str
+    description: str
     numberOfItems: int
 
 
 class ProjectResponse(ProjectBase):
     id: int
     user_id: int
+
+
+class UpdateProject(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
 
 
 class ProjectWithRecordsResponse(BaseModel):
