@@ -1,37 +1,49 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from backend.config.database import get_db
-from backend.models.prompt import Prompt
+from backend.schemas.prompt import AddPrompt, GetPrompts, UpdatePrompt
+from backend.services.promptService import add_new_prompt_service, update_prompt_service, delete_prompt_service, \
+    get_prompts_service
 
-router = APIRouter(prefix="/projects", tags=["Projects"])
-
-
-@router.get("/test-connection")
-def test_database_connection(db: Session = Depends(get_db)):
-    try:
-        db.execute("SELECT 1")  # Simple query to test connection
-        return {"status": "success", "message": "Database connection successful!"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database connection failed: {e}")
+router = APIRouter(prefix="/prompts", tags=["prompts"])
 
 
-@router.post("/test-insert")
-def test_database_insert(db: Session = Depends(get_db)):
-    try:
-        db_project = Prompt(name="hdfd")
-        db.add(db_project)
-        db.commit()
-        db.refresh(db_project)
-        return {"status": "success", "message": "Inserted dummy project!", "project_id": db_project.id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database insert failed: {e}")
+@router.post("/")
+def add_new_prompt(prompt: AddPrompt, db: Session = Depends(get_db)):
+    return add_new_prompt_service(prompt, db)
 
 
-@router.get("/prompts")
-def get_all_prompts(db: Session = Depends(get_db)):
-    try:
-        prompts = db.query(Prompt).all()
-        return prompts
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not fetch prompts: {e}")
+@router.get("/{pid}")
+def get_single_prompt(
+        pid: int,
+        db: Session = Depends(get_db)
+):
+    return get_single_prompt(pid, db)
+
+
+@router.get("/", response_model=List[GetPrompts])
+def get_prompts(
+        projectId: int,
+        db: Session = Depends(get_db)
+):
+    return get_prompts_service(projectId,db)
+
+
+@router.put("/{pid}")
+def update_prompt(
+        pid: int,
+        prompt: UpdatePrompt,
+        db: Session = Depends(get_db)
+):
+    return update_prompt_service(pid, prompt, db)
+
+
+@router.delete("/{pid")
+def delete_prompt(
+        pid: int,
+        db: Session = Depends(get_db)
+):
+    return delete_prompt_service(pid, db)

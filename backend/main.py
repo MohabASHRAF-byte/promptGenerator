@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import project_router
+from backend.routers import project_router ,prompt_router
 
 app = FastAPI()
 from backend.config.database import engine, Base
@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# app.include_router(prompt_router)
+app.include_router(prompt_router)
 app.include_router(project_router)
 
 

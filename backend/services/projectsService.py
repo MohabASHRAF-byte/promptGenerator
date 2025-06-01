@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Session
+from typing import List
+
+from sqlalchemy.orm import Session, joinedload
 from starlette.exceptions import HTTPException
 
 from backend.models.projects import Project
@@ -11,10 +13,6 @@ def add_new_project_service(project: ProjectCreate, db: Session):
     db.commit()
     db.refresh(project)
     return project
-
-
-from sqlalchemy.orm import joinedload
-from typing import List
 
 
 def get_all_projects(db: Session) -> List[GetProjectsItem]:
@@ -32,7 +30,12 @@ def get_all_projects(db: Session) -> List[GetProjectsItem]:
 
 
 def get_project_service(id: int, db: Session):
-    db_project = db.query(Project).filter(id == Project.id).first()
+    db_project = (
+        db.query(Project)
+        .options(joinedload(Project.prompts))
+        .filter(id == Project.id)
+        .first()
+    )
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
     return db_project
