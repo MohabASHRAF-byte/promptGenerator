@@ -2,7 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.routers import prompt_router
+
 app = FastAPI()
+from backend.config.database import engine, Base
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
 # Allow all origins, all methods, and all headers
 app.add_middleware(
@@ -12,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+app.include_router(prompt_router)
 
 
 @app.get("/ping")

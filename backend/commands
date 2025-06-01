@@ -1,0 +1,2 @@
+.venv/bin/python -m PyInstaller --onefile backend/main.py --distpath ./electron/backend
+sudo kill -9 $(sudo lsof -t -i:5000)
