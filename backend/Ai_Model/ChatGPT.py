@@ -24,7 +24,8 @@ class ChatGPT(LlmProvider):
         return instructions
 
     def add_instructions(self, instructions: List[str], prompt: dict) -> dict:
-        cleaned_instructions = self._preProcessInstructions(instructions)
+        # cleaned_instructions = self._preProcessInstructions(instructions)
+        cleaned_instructions = instructions
         cleaned_instructions.append("Follow this instructions.")
         prompt['messages'].append({
             "role": "system",

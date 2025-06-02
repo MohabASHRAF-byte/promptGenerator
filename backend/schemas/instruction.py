@@ -18,6 +18,7 @@ class InstructionBase(BaseModel):
 class InstructionCreate(BaseModel):
     promptId: int
     content: str
+    CheckGrammarAndSpelling:bool
 
 
 class InstructionUpdate(BaseModel):

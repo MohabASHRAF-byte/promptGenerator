@@ -3,6 +3,9 @@ from typing import List
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
+from backend.Utils.ReplaceAbbreviations import replace_abbreviations
+from backend.Utils.cleanSentence import cleanSentence
+from backend.Utils.removeRedundancy import remove_redundancy
 from backend.models.instruction import Instruction
 from backend.schemas.instruction import InstructionCreate, InstructionUpdate
 from backend.services.promptService import _get_single_prompt_service
@@ -10,7 +13,13 @@ from backend.services.promptService import _get_single_prompt_service
 
 def add_new_instruction_service(instruction: InstructionCreate, db: Session):
     prompt = _get_single_prompt_service(instruction.promptId, db)
-    ins = Instruction(content=instruction.content, prompt=prompt)
+    # preProcessing
+    inst = replace_abbreviations(instruction.content)
+    if instruction.CheckGrammarAndSpelling:
+        inst = cleanSentence([inst])[0]
+    inst = str(inst).strip()
+    inst = remove_redundancy(inst)
+    ins = Instruction(content=inst, prompt=prompt)
     db.add(ins)
     db.commit()
     db.refresh(ins)
