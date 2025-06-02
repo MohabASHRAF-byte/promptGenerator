@@ -1,21 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import Sidebar from "./components/Sidebar/Sidebar";
+import Home from "./pages/Home";
+import Prompt from "./pages/Prompt";
+import "./theme.css";
 
-function App() {
-  const [msg, setMsg] = useState('Loading...');
+const App = () => {
+  const [selectedProject, setSelectedProject] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:5000/ping')
-      .then((res) => res.json())
-      .then((data) => setMsg(data.message))
-      .catch((err) => setMsg('Error: ' + err));
-  }, []);
+  const handlePromptClick = (id) => navigate(`/prompt/${id}`);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-      <h1>Backend Message:</h1>
-      <p>{msg}</p>
+    <div className="app dark-mode">
+      <Sidebar selectedProjectId={selectedProject} onSelect={setSelectedProject} />
+      <div className="main-area">
+        <Routes>
+          <Route path="/" element={<Home projectId={selectedProject} onPromptClick={handlePromptClick} />} />
+          <Route path="/prompt/:id" element={<Prompt />} />
+        </Routes>
+      </div>
     </div>
   );
-}
+};
 
-export default App;
+const AppWithRouter = () => (
+  <Router>
+    <App />
+  </Router>
+);
+
+export default AppWithRouter;

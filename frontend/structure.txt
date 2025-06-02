@@ -1,0 +1,25 @@
+src/
+  api/
+    index.js          # Base API setup
+    projects.js       # Project API calls
+    prompts.js        # Prompt API calls
+    instructions.js   # Instruction API calls
+  components/
+    Sidebar/
+      Sidebar.js
+      ProjectItem.js
+      AddProject.js
+    Main/
+      MainContent.js
+      PromptList.js
+      PromptItem.js
+    PromptPage/
+      PromptDetails.js
+      PromptGenerate.js
+  pages/
+    Home.js
+    Prompt.js
+  App.js
+  index.js
+  theme.js            # (for dark mode config)
+.env                 # REACT_APP_API_BASE_URL=...
