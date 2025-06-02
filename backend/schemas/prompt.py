@@ -16,8 +16,8 @@ class AddPrompt(BaseModel):
 
 
 class UpdatePrompt(BaseModel):
-    name: Optional[str]
-    code_only: Optional[bool]
+    name: Optional[str] = None
+    code_only: Optional[bool] = None
 
 
 from pydantic import BaseModel

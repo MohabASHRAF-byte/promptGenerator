@@ -9,7 +9,7 @@ from backend.services.projectsService import get_project_service
 
 def add_new_prompt_service(prompt: AddPrompt, db: Session):
     project = get_project_service(prompt.project_id, db)
-    prom = Prompt(name=prompt.name, code_only=prompt.code_only, project=project)
+    prom = Prompt(name=prompt.name, code_only=prompt.code_only, project_id=prompt.project_id)
     db.add(prom)
     db.commit()
     db.refresh(prom)
