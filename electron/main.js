@@ -13,7 +13,7 @@ function createWindow() {
     webPreferences: { nodeIntegration: true }
   });
   win.loadURL('http://localhost:3000');
-  win.webContents.openDevTools();
+//  win.webContents.openDevTools();
 }
 
 function startBackendServer() {

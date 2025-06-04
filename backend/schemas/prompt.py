@@ -13,7 +13,7 @@ class AddPrompt(BaseModel):
     project_id: int
     name: str
     code_only: bool
-    ai_role: str
+    ai_role: Optional[str] = None
     experience_level: str = "Expert"
     is_code: bool = False
 

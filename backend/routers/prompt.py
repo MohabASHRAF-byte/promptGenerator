@@ -57,4 +57,4 @@ def generate_prompt(
         prompt : GeneratePrompt,
         db: Session = Depends(get_db)
 ):
-    return {"data":generate_prompt_service(pid,prompt,db)}
+    return generate_prompt_service(pid,prompt,db)

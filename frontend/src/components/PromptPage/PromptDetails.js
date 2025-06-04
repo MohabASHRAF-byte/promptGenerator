@@ -85,6 +85,7 @@ const PromptDetails = ({ promptId }) => {
   const [editing, setEditing] = useState(null);
   const [newInstruction, setNewInstruction] = useState("");
   const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fetchPrompt = async () => {
     const res = await getPrompt(promptId);
@@ -100,19 +101,14 @@ const PromptDetails = ({ promptId }) => {
   const handleGenerate = async () => {
     setSaving(true);
     const res = await generatePrompt(promptId, { content: input });
-    setResult(res.data);
-    console.log(res.data);
-    console.log(res.data.messages);
+    setResult(res.data.prompt);
     setSaving(false);
   };
 
-  // Toggle code_only with local update
-  const handleToggleCodeOnly = async () => {
-    const newVal = !prompt.code_only;
-    setPrompt((prev) => ({ ...prev, code_only: newVal })); // Optimistic update
-    await updatePrompt(promptId, { code_only: newVal });
-    // Optionally, re-fetch for 100% accuracy:
-    // fetchPrompt();
+  // Parameter handlers
+  const handleParamChange = async (field, value) => {
+    setPrompt((prev) => ({ ...prev, [field]: value }));
+    await updatePrompt(promptId, { [field]: value });
   };
 
   // Edit instruction
@@ -140,10 +136,12 @@ const PromptDetails = ({ promptId }) => {
     fetchPrompt();
   };
 
-  // Copy output
+  // Copy output with animation
   const handleCopy = () => {
     if (result) {
       navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
     }
   };
 
@@ -155,17 +153,50 @@ const PromptDetails = ({ promptId }) => {
       {/* Title */}
       <h1 className="prompt-title">{prompt.name}</h1>
 
-      {/* Code only toggle */}
-      <div className="row-center" style={{ marginBottom: 20 }}>
-        <label className="toggle-label">
+      {/* All prompt parameters */}
+      <div className="parameters-section" style={{ marginBottom: 24 }}>
+        <div className="row-center" style={{ marginBottom: 10 }}>
+          <label className="toggle-label" style={{ marginRight: 24 }}>
+            <input
+              type="checkbox"
+              checked={prompt.code_only}
+              onChange={e => handleParamChange("code_only", e.target.checked)}
+            />
+            <span className="toggle-slider"></span>
+            <span style={{ marginLeft: 8 }}>Code Only</span>
+          </label>
+          <label className="toggle-label" style={{ marginRight: 24 }}>
+            <input
+              type="checkbox"
+              checked={prompt.is_code}
+              onChange={e => handleParamChange("is_code", e.target.checked)}
+            />
+            <span className="toggle-slider"></span>
+            <span style={{ marginLeft: 8 }}>Is Code</span>
+          </label>
+        </div>
+        <div className="row-center" style={{ marginBottom: 10 }}>
+          <label style={{ marginRight: 8, minWidth: 90 }}>AI Role:</label>
           <input
-            type="checkbox"
-            checked={prompt.code_only}
-            onChange={handleToggleCodeOnly}
+            type="text"
+            value={prompt.ai_role || ""}
+            onChange={e => handleParamChange("ai_role", e.target.value)}
+            className="param-input"
+            style={{ minWidth: 180 }}
+            placeholder="e.g. assistant"
           />
-          <span className="toggle-slider"></span>
-          <span style={{ marginLeft: 12 }}>Code Only</span>
-        </label>
+        </div>
+        <div className="row-center" style={{ marginBottom: 10 }}>
+          <label style={{ marginRight: 8, minWidth: 90 }}>Experience:</label>
+          <input
+            type="text"
+            value={prompt.experience_level || ""}
+            onChange={e => handleParamChange("experience_level", e.target.value)}
+            className="param-input"
+            style={{ minWidth: 180 }}
+            placeholder="e.g. expert"
+          />
+        </div>
       </div>
 
       {/* Instructions */}
@@ -180,16 +211,12 @@ const PromptDetails = ({ promptId }) => {
                   <input
                     className="edit-input"
                     value={editing.content}
-                    onChange={(e) =>
-                      setEditing({ ...editing, content: e.target.value })
-                    }
+                    onChange={e => setEditing({ ...editing, content: e.target.value })}
                     autoFocus
                   />
                   <button
                     className="btn save"
-                    onClick={() =>
-                      handleEditInstruction(ins.id, editing.content)
-                    }
+                    onClick={() => handleEditInstruction(ins.id, editing.content)}
                   >
                     Save
                   </button>
@@ -204,9 +231,7 @@ const PromptDetails = ({ promptId }) => {
                 <>
                   <span style={{ flex: 1 }}>{ins.content}</span>
                   <EditIcon
-                    onClick={() =>
-                      setEditing({ id: ins.id, content: ins.content })
-                    }
+                    onClick={() => setEditing({ id: ins.id, content: ins.content })}
                   />
                   <DeleteIcon onClick={() => handleDeleteInstruction(ins.id)} />
                 </>
@@ -220,8 +245,8 @@ const PromptDetails = ({ promptId }) => {
             className="add-input"
             placeholder="New instruction..."
             value={newInstruction}
-            onChange={(e) => setNewInstruction(e.target.value)}
-            onKeyDown={(e) => {
+            onChange={e => setNewInstruction(e.target.value)}
+            onKeyDown={e => {
               if (e.key === "Enter") handleAddInstruction();
             }}
           />
@@ -238,7 +263,7 @@ const PromptDetails = ({ promptId }) => {
           <h3>Input Query</h3>
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={e => setInput(e.target.value)}
             placeholder="Enter input for prompt generation..."
           />
           <button
@@ -259,11 +284,28 @@ const PromptDetails = ({ promptId }) => {
             }}
           >
             <h3>Output</h3>
-            {result && <CopyIcon onClick={handleCopy} />}
+            {result && (
+              <span style={{ display: "flex", alignItems: "center" }}>
+                <CopyIcon onClick={handleCopy} />
+                <span
+                  style={{
+                    marginLeft: 8,
+                    color: "#38b000",
+                    opacity: copied ? 1 : 0,
+                    transition: "opacity 0.5s",
+                    fontWeight: "bold",
+                    fontSize: 14,
+                    verticalAlign: "middle",
+                  }}
+                >
+                  Copied!
+                </span>
+              </span>
+            )}
           </div>
           <div className="output-area">
             <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {result ? JSON.stringify(result, null, 2) : "—"}
+              {result || "—"}
             </pre>
           </div>
         </div>

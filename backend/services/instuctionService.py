@@ -12,6 +12,7 @@ from backend.services.promptService import _get_single_prompt_service
 
 
 def add_new_instruction_service(instruction: InstructionCreate, db: Session):
+    print(instruction)
     prompt = _get_single_prompt_service(instruction.promptId, db)
     # preProcessing
     inst = replace_abbreviations(instruction.content)
